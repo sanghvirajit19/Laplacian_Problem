@@ -1,6 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sn
+import timeit
+import sys
+
+np.set_printoptions(threshold=sys.maxsize)
 
 def Laplacian_Problem(n):
 
@@ -60,29 +64,54 @@ def jacobi_step(T):
 
 def simulation(T, epsilon=None, num_steps=None):
 
+    global _T, residual
     m, n = T.shape
-    _T = T
+    residual_list = []
+    iteration_list = []
 
     for i in range(num_steps):
 
         # Heater should be there at its own place all the time
-        _T[(3 * n // 8):(n // 2) + 1, :(n // 8 + 1)] = 40
-        _T[(n // 2):(5 * n // 8) + 1, -(n // 8 + 1):] = 40
+        T[(3 * n // 8):(n // 2) + 1, :(n // 8 + 1)] = 40
+        T[(n // 2):(5 * n // 8) + 1, -(n // 8 + 1):] = 40
 
-        _T = jacobi_step(_T)
+        _T = jacobi_step(T)
 
+        residual_vector = _T - T
+        residual = np.max(np.abs(residual_vector))
+        residual_list.append(residual)
+        iteration_list.append(i)
+
+        if residual < epsilon:
+            print("Convergence Criteria satisfied")
+            print("Solution converged in {} iterations".format(i))
+            break
+
+        T = _T
+
+    print("Iteration criteria satisfied")
+    print("Solution converged in {} iterations".format(i))
+    print("Residual: {}".format(residual))
+
+    plt.plot(iteration_list, residual_list)
+    plt.xlabel("Iterations")
+    plt.ylabel("Residual drop")
+    plt.show()
     return _T
 
 # Making the grid with BC
-A = Laplacian_Problem(16)
+A = Laplacian_Problem(32)
 
 # Visualizing the problem
 sn.heatmap(A)
 plt.show()
 
+start = timeit.default_timer()
 # Running the simulation
-B = simulation(A, num_steps=10000)
+B = simulation(A, epsilon=2, num_steps=1000)
+end = timeit.default_timer()
 
+print("runtime: {} s".format(float(round(end - start, 3))))
 # Approximate solution
 sn.heatmap(B)
 plt.show()
