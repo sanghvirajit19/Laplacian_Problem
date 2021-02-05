@@ -43,3 +43,7 @@ Approximate Solutions are shown below.
     
 ![Approximate solutionon coarser grid (128) in 10000 Iterations](https://user-images.githubusercontent.com/42026685/106936768-425c7480-671d-11eb-8ce5-064947efbfac.png)
 
+# Residual plot
+
+![Residual drop](https://user-images.githubusercontent.com/42026685/107016647-7c218f80-679e-11eb-8879-998a13ae1017.png)
+
