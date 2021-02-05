@@ -27,25 +27,25 @@ Approximate Solutions are shown below.
 
 1. Solution on coarser grid (32x32)
     
-    Criteria: epsilon=1e-05 or Iteration=5000
-    Solution converged in 5000 iterations
-    simulation runtime: 28.453 s
+    Criteria: epsilon=1e-05 or Iteration=5000,
+    Solution converged in 5000 iterations,
+    simulation runtime: 28.453 s.
 
 ![Approximate solutionon coarser grid (32) in 10000 Iterations](https://user-images.githubusercontent.com/42026685/106936231-9dda3280-671c-11eb-837b-22735de8cab3.png)
 
 2. Solution on coarser grid (64x64)
   
-    Criteria: epsilon=1e-05 or Iteration=5000
-    Solution converged in 5000 iterations
-    simulation runtime: 57.529 s
+    Criteria: epsilon=1e-05 or Iteration=5000,
+    Solution converged in 5000 iterations,
+    simulation runtime: 57.529 s.
     
 ![Approximate solutionon coarser grid (64) in 10000 Iterations](https://user-images.githubusercontent.com/42026685/106936690-2eb10e00-671d-11eb-8f92-4f9d6b09aba7.png)
 
 3. Solution on finer grid (128x128)
     
-    Criteria: epsilon=1e-05 or Iteration=5000
-    Solution converged in 5000 iterations
-    simulation runtime: 154.546 s
+    Criteria: epsilon=1e-05 or Iteration=5000,
+    Solution converged in 5000 iterations,
+    simulation runtime: 154.546 s.
     
 ![Approximate solutionon coarser grid (128) in 10000 Iterations](https://user-images.githubusercontent.com/42026685/106936768-425c7480-671d-11eb-8ce5-064947efbfac.png)
 
