@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sn
 import timeit
 import sys
+from numpy import linalg as LA
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -66,20 +67,26 @@ def simulation(T, epsilon=None, num_steps=None):
 
     global _T, residual
     m, n = T.shape
-    residual_list = []
+
     iteration_list = []
+    l2_list = []
+    i = 0
+    residual = 1
 
     for i in range(num_steps):
 
+        i += 1
         # Heater should be there at its own place all the time
         T[(3 * n // 8):(n // 2) + 1, :(n // 8 + 1)] = 40
         T[(n // 2):(5 * n // 8) + 1, -(n // 8 + 1):] = 40
 
         _T = jacobi_step(T)
+        error = _T - T
+        T = _T
 
-        residual_vector = _T - T
-        residual = np.max(np.abs(residual_vector))
-        residual_list.append(residual)
+        l2_norm = LA.norm(error)
+        l2_list.append(l2_norm)
+
         iteration_list.append(i)
 
         if residual < epsilon:
@@ -87,20 +94,27 @@ def simulation(T, epsilon=None, num_steps=None):
             print("Solution converged in {} iterations".format(i))
             break
 
-        T = _T
+        l2_array = np.asarray(l2_list)
+        maximum_value = l2_array.max()
+        resi_drop = l2_array / maximum_value
 
-    print("Iteration criteria satisfied")
-    print("Solution converged in {} iterations".format(i))
-    print("Residual: {}".format(residual))
+        residual_list = np.log(resi_drop).reshape(-1, 1)
+        iteration = np.asarray(iteration_list).reshape(-1, 1)
 
-    plt.plot(iteration_list, residual_list)
+        residual = residual_list[-1]
+
+        if i == num_steps-1:
+            print("Iteration criteria satisfied")
+            print("Solution converged in {} iterations".format(i))
+
+    plt.plot(iteration, residual_list)
     plt.xlabel("Iterations")
     plt.ylabel("Residual drop")
     plt.show()
     return _T
 
 # Making the grid with BC
-A = Laplacian_Problem(32)
+A = Laplacian_Problem(16)
 
 # Visualizing the problem
 sn.heatmap(A)
@@ -108,7 +122,7 @@ plt.show()
 
 start = timeit.default_timer()
 # Running the simulation
-B = simulation(A, epsilon=2, num_steps=1000)
+B = simulation(A, epsilon=-3, num_steps=200)
 end = timeit.default_timer()
 
 print("runtime: {} s".format(float(round(end - start, 3))))
