@@ -45,5 +45,6 @@ Approximate Solutions are shown below.
 
 # Residual plot
 
-![Residual drop](https://user-images.githubusercontent.com/42026685/107016647-7c218f80-679e-11eb-8879-998a13ae1017.png)
+![Residual drop](https://user-images.githubusercontent.com/42026685/107026998-d2e19600-67ab-11eb-918d-4bac452d7d20.png)
+
 
