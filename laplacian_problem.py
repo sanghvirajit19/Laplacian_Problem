@@ -70,7 +70,6 @@ def simulation(T, epsilon=None, num_steps=None):
 
     iteration_list = []
     l2_list = []
-    i = 0
     residual = 1
 
     for i in range(num_steps):
@@ -89,7 +88,7 @@ def simulation(T, epsilon=None, num_steps=None):
 
         iteration_list.append(i)
 
-        if residual < epsilon:
+        if residual < np.log10(epsilon):
             print("Convergence Criteria satisfied")
             print("Solution converged in {} iterations".format(i))
             break
@@ -122,7 +121,7 @@ plt.show()
 
 start = timeit.default_timer()
 # Running the simulation
-B = simulation(A, epsilon=-3, num_steps=200)
+B = simulation(A, epsilon=1e-02, num_steps=200)
 end = timeit.default_timer()
 
 print("runtime: {} s".format(float(round(end - start, 3))))
