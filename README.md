@@ -47,4 +47,7 @@ Approximate Solutions are shown below.
 
 ![Residual drop](https://user-images.githubusercontent.com/42026685/107026998-d2e19600-67ab-11eb-918d-4bac452d7d20.png)
 
+# Multigrid Method
+
+![multigrid](https://user-images.githubusercontent.com/42026685/107789334-bddba880-6d51-11eb-9275-19ebb3d706e3.png)
 
