@@ -7,7 +7,7 @@ from numpy import linalg as LA
 
 np.set_printoptions(threshold=sys.maxsize)
 
-def Laplacian_Problem(n):
+def Grid_with_BC(n):
 
     #grid
     f = np.zeros((n, n))
@@ -24,7 +24,7 @@ def Laplacian_Problem(n):
     f[1, (3 * n // 4):] = np.arange(5, 13, (13 - 5) / (n // 4))
 
     # Bottom
-    f[n-1:, :] = 21
+    f[n-2:, :] = 21
 
     # Left
     f[:(3 * n // 8), 0] = np.arange(13, 40, ((40 - 13) / (3 * n // 8)))
@@ -63,9 +63,49 @@ def jacobi_step(T):
 
     return _T
 
-def simulation(T, epsilon=None, num_steps=None):
+def restriction(T):
 
-    global _T, residual
+    m = T.shape[0] // 2
+    n = T.shape[1] // 2
+
+    _T = np.zeros((m, n))
+    s = 2                   #Taking only alternate rows and columns
+
+    # Heater should be there at its own place all the time
+    _T[(3 * n // 8):(n // 2) + 1, :(n // 8 + 1)] = 40
+    _T[(n // 2):(5 * n // 8) + 1, -(n // 8 + 1):] = 40
+
+    for i in range(m):
+        for j in range(n):
+            _T[i, j] = T[i * s, j * s]
+
+    return _T
+
+def prolongation(T):
+
+    m = T.shape[0] * 2
+    n = T.shape[1] * 2
+
+    _T = Grid_with_BC(m)
+
+    # Heater should be there at its own place all the time
+    _T[(3 * n // 8):(n // 2) + 1, :(n // 8 + 1)] = 40
+    _T[(n // 2):(5 * n // 8) + 1, -(n // 8 + 1):] = 40
+
+    for i in range(2, m-2):
+        for j in range(2, n-2):
+
+            _T[i, j] = (T[int(np.floor((i+1)/2)), int(np.floor((j+1)/2))]
+                       + T[int(np.ceil((i+1)/2)), int(np.floor((j+1)/2))]
+                       + T[int(np.floor((i+1)/2)), int(np.ceil((j+1)/2))]
+                       + T[int(np.ceil((i+1)/2)), int(np.ceil((j+1)/2))]) / 4
+
+    return _T
+
+def simulation(T, epsilon=None, num_steps=None, residual_plot=False, runtime=False):
+
+    start = timeit.default_timer()
+    global _T, residual, iteration, residual_list
     m, n = T.shape
 
     iteration_list = []
@@ -106,25 +146,94 @@ def simulation(T, epsilon=None, num_steps=None):
             print("Iteration criteria satisfied")
             print("Solution converged in {} iterations".format(i))
 
-    plt.plot(iteration, residual_list)
-    plt.xlabel("Iterations")
-    plt.ylabel("Residual drop")
-    plt.show()
+    if residual_plot == True:
+        plt.plot(iteration, residual_list)
+        plt.xlabel("Iterations")
+        plt.ylabel("Residual drop")
+        plt.show()
+
+    end = timeit.default_timer()
+
+    if runtime == True:
+        print("runtime: {} s".format(float(round(end - start, 3))))
+
     return _T
 
-# Making the grid with BC
-A = Laplacian_Problem(16)
+def single_level(grid, runtime=False):
 
-# Visualizing the problem
-sn.heatmap(A)
-plt.show()
+    start = timeit.default_timer()
+    # Making the grid with BC
+    A = Grid_with_BC(grid)
 
-start = timeit.default_timer()
-# Running the simulation
-B = simulation(A, epsilon=1e-02, num_steps=200)
-end = timeit.default_timer()
+    # Visualizing the problem
+    sn.heatmap(A)
+    plt.show()
 
-print("runtime: {} s".format(float(round(end - start, 3))))
-# Approximate solution
-sn.heatmap(B)
-plt.show()
+    # Running the simulation
+    B = simulation(A, epsilon=1e-5, num_steps=10000, residual_plot=True)
+
+    # Approximate solution
+    sn.heatmap(B)
+    plt.show()
+
+    end = timeit.default_timer()
+
+    if runtime == True:
+        print("runtime: {} s".format(float(round(end - start, 3))))
+
+    return B
+
+def multi_level(grid, runtime=False):
+
+    start_ = timeit.default_timer()
+    print("Simulation Running...")
+    A = Grid_with_BC(grid)
+
+    # Approximate solution
+    sn.heatmap(A)
+    plt.show()
+
+    B = simulation(A, epsilon=1e-5, num_steps=5000, residual_plot=True, runtime=False)
+
+    # Approximate solution
+    sn.heatmap(B)
+    plt.show()
+
+    # Downlevel
+    C = restriction(B)
+    print("downleveled")
+
+    # Approximate solution
+    sn.heatmap(C)
+    plt.show()
+
+    D = simulation(C, epsilon=1e-5, num_steps=5000, residual_plot=True, runtime=False)
+
+    # Approximate solution
+    sn.heatmap(D)
+    plt.show()
+
+    # Uplevel
+    E = prolongation(D)
+    print("upleveled")
+
+    # Approximate solution
+    sn.heatmap(E)
+    plt.show()
+
+    F = simulation(E, epsilon=1e-5, num_steps=5000, residual_plot=True, runtime=False)
+
+    # Approximate solution
+    sn.heatmap(F)
+    plt.show()
+
+    end_ = timeit.default_timer()
+
+    if runtime == True:
+        print("runtime: {} s".format(float(round(end_ - start_, 3))))
+
+    return E
+
+solution_A = single_level(256, runtime=True)
+
+solution_B = multi_level(256, runtime=True)
