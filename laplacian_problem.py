@@ -69,7 +69,7 @@ def restriction(T):
     n = T.shape[1] // 2
 
     _T = np.zeros((m, n))
-    s = 2                   #Taking only alternate rows and columns
+    s = 2                   # Taking only alternate rows and columns
 
     # Heater should be there at its own place all the time
     _T[(3 * n // 8):(n // 2) + 1, :(n // 8 + 1)] = 40
@@ -170,7 +170,7 @@ def single_level(grid, runtime=False):
     plt.show()
 
     # Running the simulation
-    B = simulation(A, epsilon=1e-5, num_steps=10000, residual_plot=True)
+    B = simulation(A, epsilon=1e-5, num_steps=4000, residual_plot=True)
 
     # Approximate solution
     sn.heatmap(B)
@@ -234,6 +234,6 @@ def multi_level(grid, runtime=False):
 
     return E
 
-solution_A = single_level(256, runtime=True)
+solution_A = single_level(128, runtime=True)
 
-solution_B = multi_level(256, runtime=True)
+#solution_B = multi_level(256, runtime=True)
